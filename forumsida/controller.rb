@@ -70,7 +70,7 @@ end
 
 get('/discussion/:id') do
     posts, disk = diskussion(params["id"])
-
+    slim(:discussion, locals:{})
 end
 
 error 404 do
