@@ -27,5 +27,17 @@ end
 def kategorier()
     db = SQLite3::Database.new("db/databas.db")
     db.results_as_hash = true
-    db.execute('SELECT Id,Namn FROM Kategorier')
+    db.execute('SELECT * FROM Kategorier')
+end
+
+def kategori(id)
+    db = SQLite3::Database.new("db/databas.db")
+    db.results_as_hash = true
+    return db.execute('SELECT Id,Titel FROM Diskussioner WHERE KatId=?', id), db.execute('SELECT * FROM Kategorier WHERE Id=?', id)
+end
+
+def diskussion(id)
+    db = SQLite3::Database.new("db/databas.db")
+    db.results_as_hash = true
+    db.execute('SELECT * FROM Diskussioner WHERE Id=?', id), db.execute('SELECT * FROM Inlägg WHERE DiskId=?', id)
 end

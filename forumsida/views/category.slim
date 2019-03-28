@@ -1,0 +1,10 @@
+h1="#{cat["Namn"]}"
+a href="/"
+    p Hem
+h2="Diskussioner"
+-if session[:account] != nil
+    a href="/discussion/create"
+        p Skapa din egna diskussion.
+-discs.each do |disc|
+    a href="/discussion/#{disc["Id"]}"
+        p="#{disc["Titel"]}"

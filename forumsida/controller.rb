@@ -52,7 +52,7 @@ end
 post('/signup') do
     signup = register(params)
     if signup == true
-        redirect('/')
+        redirect('/login')
     else
         redirect('/signup')
     end
@@ -63,7 +63,15 @@ get('/categories') do
     slim(:categories, locals:{cats:cat})
 end
 
+get('/categories/:id') do 
+    disc, kat = kategori(params["id"])
+    slim(:category, locals:{discs:disc, cat:kat[0]})
+end
 
+get('/discussion/:id') do
+    posts, disk = diskussion(params["id"])
+
+end
 
 error 404 do
     "Page not found"
