@@ -23,3 +23,9 @@ def register(params)
         return false
     end
 end
+
+def kategorier()
+    db = SQLite3::Database.new("db/databas.db")
+    db.results_as_hash = true
+    db.execute('SELECT Id,Namn FROM Kategorier')
+end

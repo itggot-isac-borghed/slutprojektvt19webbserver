@@ -58,6 +58,13 @@ post('/signup') do
     end
 end
 
+get('/categories') do
+    cat = kategorier()
+    slim(:categories, locals:{cats:cat})
+end
+
+
+
 error 404 do
     "Page not found"
 end

@@ -30,3 +30,4 @@ flera diskussioner så att den får en notis när ett nytt inlägg läggs upp.
 * model.rb: Den fil som behandlar all kommunikation som servern behöver göra med databasen.
 
 ## 5. (Databas med ER-diagram)
+* Ofärdigt ER diagram finns i misc.
