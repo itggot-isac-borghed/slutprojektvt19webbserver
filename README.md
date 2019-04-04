@@ -6,7 +6,8 @@
 En forumsida där användare kan skapa diskussioner som användare kan lägga till inlägg i.
 Den ska innehålla ett inloggningssystem så att man måste vara inloggad för att kunna lägga
 upp inlägg på sidan. Många till många relation uppnås då en användare ska kunna följa
-flera diskussioner så att den får en notis när ett nytt inlägg läggs upp.
+flera diskussioner så att den lätt kan hitta till dem utan att behöva navigera sig genom
+hela sidan först
 
 ## 2. Vyer (sidor)
 * Det ska finnas en förstasida där man kan navigera till resten av forumet.

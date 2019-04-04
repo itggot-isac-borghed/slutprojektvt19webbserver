@@ -3,7 +3,7 @@ a href="/"
     p Hem
 h2="Diskussioner"
 -if session[:account] != nil
-    a href="/discussion/create"
+    a href="/discussion/create/#{cat["Id"]}"
         p Skapa din egna diskussion.
 -discs.each do |disc|
     a href="/discussion/#{disc["Id"]}"

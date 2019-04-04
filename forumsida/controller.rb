@@ -6,7 +6,7 @@ require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/logout"]
+    set :secured_route, ["/logout", "/newpost", "/discussion/create/:id"]
 end
 
 before do
@@ -29,7 +29,6 @@ end
 post('/login') do
     loggedin = login(params)
     if loggedin == true
-        session[:account] = params["Username"]
         redirect('/')
     else
         redirect('/loginfail')
@@ -41,7 +40,7 @@ get('/loginfail') do
 end
 
 post('/logout') do
-    session[:account] = nil
+    session[:account], session[:id] = nil, nil
     redirect('/')
 end
 
@@ -68,10 +67,23 @@ get('/categories/:id') do
     slim(:category, locals:{discs:disc, cat:kat[0]})
 end
 
-get('/discussion/:id') do
-    posts, disk = diskussion(params["id"])
-    slim(:discussion, locals:{})
+get('/discussion/create/:id') do
+    slim(:createdisc, locals:{id:params["id"]})
 end
+
+post('/dicussion/create/:id') do
+
+    redirect("/categories/#{params["id"]}")
+end
+
+get('/discussion/:id') do
+    diskussion = diskussion(params["id"])
+    inlg = diskussion[0]
+    disk = diskussion[1]
+    slim(:discussion, locals:{disc:disk[0], posts:inlg})
+end
+
+
 
 error 404 do
     "Page not found"

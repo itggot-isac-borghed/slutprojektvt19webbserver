@@ -1,0 +1,21 @@
+h1="#{disc["Titel"]}"
+a href="/"
+    p Hem
+a href="/users/#{disc["ÄgarId"]}"
+    p="Ägare: #{disc["Namn"]}"
+p="#{disc["Info"]}"
+
+h3 Inlägg
+-if session[:account]
+    p Lägg till ett inlägg.
+    form action="/newpost" method="post"
+-if posts.empty? == true
+    p Oj här var det tomt!
+-else
+    -posts.each_with_index do |post,i|
+        p="#{i}"
+        p="#{post["Info"]}"
+        -if post["Bild"]
+            img src="/img/#{post["Bild"]}" alt=""
+        a href="/users/#{"post["ÄgarId"]}"
+            p="Av: #{post["Namn"]}"

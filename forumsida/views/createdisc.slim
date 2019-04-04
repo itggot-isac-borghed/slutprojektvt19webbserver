@@ -1,0 +1,11 @@
+h1 Skapa discussion
+a href="/"
+    p Hem
+form action="/discussion/create/#{id}" method="post" enctype="multipart/form-data"
+    p Ge din diskussion en titel.
+    input type="text" name="titel"
+    p Skriv lite om din diskussion.
+    input type="text" name="info"
+    p Eventuell bild läggs upp här.
+    input type="file" name="bild"
+    input type="submit" value="Ladda upp."
