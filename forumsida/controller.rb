@@ -71,8 +71,8 @@ get('/discussion/create/:id') do
     slim(:createdisc, locals:{id:params["id"]})
 end
 
-post('/dicussion/create/:id') do
-
+post('/discussion/create/:id') do
+    skapadisk(params, session[:id])
     redirect("/categories/#{params["id"]}")
 end
 
@@ -82,8 +82,6 @@ get('/discussion/:id') do
     disk = diskussion[1]
     slim(:discussion, locals:{disc:disk[0], posts:inlg})
 end
-
-
 
 error 404 do
     "Page not found"
