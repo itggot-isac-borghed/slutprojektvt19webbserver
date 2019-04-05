@@ -4,18 +4,27 @@ a href="/"
 a href="/users/#{disc["ÄgarId"]}"
     p="Ägare: #{disc["Namn"]}"
 p="#{disc["Info"]}"
-
+img src="/img/#{disc["Bild"]}" alt=""
+-if disc["ÄgarId"] == session[:id]
+    form action="/discussion/delete/#{disc["Id"]}" method="post"
+        input type="submit" value="Radera diskussion"
 h3 Inlägg
 -if session[:account]
     p Lägg till ett inlägg.
-    form action="/newpost" method="post"
+    form action="/post/create/#{disc["Id"]}" method="post" enctype="multipart/form-data"
+        input type="text" name="info" placeholder="Skriv något"
+        input type="file" name="file"
+        input type="submit" value="Skicka kommentar"
 -if posts.empty? == true
     p Oj här var det tomt!
 -else
     -posts.each_with_index do |post,i|
-        p="#{i}"
+        p="#{i+1}"
         p="#{post["Info"]}"
         -if post["Bild"]
             img src="/img/#{post["Bild"]}" alt=""
-        a href="/users/#{"post["ÄgarId"]}"
+        a href="/users/#{post["ÄgarId"]}"
             p="Av: #{post["Namn"]}"
+        -if post["ÄgarId"] == session[:id]
+            form action="/post/delete/#{post["Id"]}" method="post"
+                input type="submit" value="Radera inlägg"

@@ -1,7 +1,7 @@
 h1 Forumsida
 -if session[:account] != nil
     p="Välkommen #{session[:account]}"
-    a href="/profile/#{session[:account]}"
+    a href="/users/#{session[:id]}"
         p Profil
 -else
     a href="/login"

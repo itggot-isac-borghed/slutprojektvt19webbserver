@@ -9,7 +9,7 @@ def login(params)
     user = db.execute('SELECT Lösenord,Id FROM Användare WHERE Namn=?', params["Username"])
     if user.empty? == false
         if (BCrypt::Password.new(user[0]["Lösenord"]) == params["Password"]) == true
-            session[:account], session[:id] = params["Username"], user[0]["id"]
+            session[:account], session[:id] = params["Username"], user[0]["Id"]
             return true
         else
             return false
@@ -50,7 +50,7 @@ def skapadisk(params, userid)
     else
         @filename = nil
     end
-    db.execute('INSERT INTO Diskussioner(ÄgarId, KatId, Titel, Info, Bild) VALUES (?, ?, ?, ?, ?)', session[:id], params["id"], 
+    db.execute('INSERT INTO Diskussioner(ÄgarId, KatId, Titel, Info, Bild) VALUES (?, ?, ?, ?, ?)', userid, params["id"], 
         params["titel"], params["info"], @filename)
 end
 
@@ -58,4 +58,41 @@ def diskussion(id)
     db = connect()
     return [db.execute('SELECT Diskussioner.*, Användare.Namn FROM Diskussioner INNER JOIN Användare ON Diskussioner.ÄgarId = Användare.Id WHERE Diskussioner.Id=?', id), 
         db.execute('SELECT Inlägg.*, Användare.Namn FROM Inlägg INNER JOIN Användare ON Inlägg.ÄgarId = Användare.Id WHERE Inlägg.DiskId=?', id)]
+end
+
+def tabortdisk(params, userid)
+    db = connect()
+    disk = db.execute('SELECT ÄgarId,KatId FROM Diskussioner WHERE Id=?', params["id"]).first
+    if disk.length == 0 || userid != disk["ÄgarId"]
+        return false
+    else
+        db.execute('DELETE FROM Diskussioner WHERE Id=?', params["id"])
+        db.execute('DELETE FROM Inlägg WHERE DiskId=?', params["id"])
+        return disk["KatId"]
+    end
+end
+
+def skapainlg(params, userid)
+    db = connect()
+    if params[:file]
+        @filename = params[:file][:filename]
+        file = params[:file][:tempfile]
+        File.open("./public/img/#{@filename}", 'wb') do |f|
+            f.write(file.read)
+        end
+    else
+        @filename = nil
+    end
+    db.execute('INSERT INTO Inlägg(DiskId, ÄgarId, Info, Bild) VALUES (?, ?, ?, ?)', params["id"], userid, params["info"], @filename)
+end
+
+def tabortinlg(params, userid)
+    db = connect()
+    inlg = db.execute('SELECT ÄgarId,DiskId FROM Inlägg WHERE Id=?', params["id"]).first
+    if userid != inlg["ÄgarId"]
+        return false
+    else
+        db.execute('DELETE FROM Inlägg WHERE Id=?', params["id"])
+        return inlg["DiskId"]
+    end
 end

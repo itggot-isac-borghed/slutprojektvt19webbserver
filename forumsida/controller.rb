@@ -6,7 +6,7 @@ require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/logout", "/newpost", "/discussion/create/:id"]
+    set :secured_route, ["/post/create/", "/discussion/create/", "discussion/delete/", "post/delete/"]
 end
 
 before do
@@ -78,9 +78,32 @@ end
 
 get('/discussion/:id') do
     diskussion = diskussion(params["id"])
-    inlg = diskussion[0]
-    disk = diskussion[1]
+    inlg = diskussion[1]
+    disk = diskussion[0]
     slim(:discussion, locals:{disc:disk[0], posts:inlg})
+end
+
+post('/discussion/delete/:id') do
+    result = tabortdisk(params, session[:id])
+    if result == false
+        halt 403
+    else
+        redirect("/categories/#{result}")
+    end
+end
+
+post('/post/create/:id') do
+    skapainlg(params, session[:id])
+    redirect("/discussion/#{params["id"]}")
+end
+
+post('/post/delete/:id') do 
+    result = tabortinlg(params, session[:id])
+    if result == false
+        halt 403
+    else
+        redirect("/discussion/#{result}")
+    end
 end
 
 error 404 do
