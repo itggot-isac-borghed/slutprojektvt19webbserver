@@ -32,6 +32,7 @@ hela sidan först
 ### Filer:
 * controller.rb: Den fil som behandlar all kommunikation mellan servern och användare, genom att behandla routes etc.
 * model.rb: Den fil som behandlar all kommunikation som servern behöver göra med databasen, som att hämta information, uppdatera etc.
+* databas.db: Databasen där all information lagras. Struktur visas i ER diagrammet.
 
 ## 5. (Databas med ER-diagram)
 * Ofärdigt ER diagram finns i misc.

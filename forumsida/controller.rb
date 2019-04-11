@@ -23,6 +23,10 @@ get('/') do
     slim(:home)
 end
 
+get('/users/:id') do
+    
+end
+
 get('/login') do
     slim(:login)
 end
