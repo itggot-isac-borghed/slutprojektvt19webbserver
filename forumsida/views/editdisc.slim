@@ -1,0 +1,10 @@
+h1 Redigera Diskussion
+a href="/" Hem
+
+p="#{disc}"
+
+form action="/discussion/edit/#{disc["Id"]}" method="post" enctype="multipart/form-data"
+    input type="text" name="Titel" value="#{disc["Titel"]}"
+    input type="text" name="Info" value="#{disc["Info"]}"
+    input type="file" name="file"
+    input type="submit" value="Spara Redigering"

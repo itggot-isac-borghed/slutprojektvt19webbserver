@@ -6,6 +6,8 @@ a href="/users/#{disc["ÄgarId"]}"
 p="#{disc["Info"]}"
 img src="/img/#{disc["Bild"]}" alt=""
 -if disc["ÄgarId"] == session[:id]
+    button
+        a href="/discussion/edit/#{disc["Id"]}" Redigera Diskussion
     form action="/discussion/delete/#{disc["Id"]}" method="post"
         input type="submit" value="Radera diskussion"
 h3 Inlägg
@@ -26,5 +28,7 @@ h3 Inlägg
         a href="/users/#{post["ÄgarId"]}"
             p="Av: #{post["Namn"]}"
         -if post["ÄgarId"] == session[:id]
+            button
+                a href="/post/edit/#{post["Id"]}" Redigera Inlägg
             form action="/post/delete/#{post["Id"]}" method="post"
                 input type="submit" value="Radera inlägg"

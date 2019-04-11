@@ -1,0 +1,11 @@
+h1 Redigera Inlägg
+a href="/" Hem
+
+form action="/post/edit/#{post["Id"]}" method="post" enctype="multipart/form-data"
+    p Info
+    input type="text" name="Info" value="#{post["Info"]}"
+    p Eventuell Bild
+    input type="file" name="file"
+    input type="submit" Value="Spara Redigering"
+
+    

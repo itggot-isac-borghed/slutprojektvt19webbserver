@@ -2,11 +2,12 @@ require 'sinatra'
 require 'sqlite3'
 require 'slim'
 require 'bcrypt'
+require 'securerandom'
 require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/post/create/", "/discussion/create/", "discussion/delete/", "post/delete/"]
+    set :secured_route, ["/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
 end
 
 before do
@@ -83,6 +84,24 @@ get('/discussion/:id') do
     slim(:discussion, locals:{disc:disk[0], posts:inlg})
 end
 
+get('/discussion/edit/:id') do
+    result = redigeradisk(params, session[:id])
+    if result == false
+        halt 403
+    else
+        slim(:editdisc, locals:{disc:result})
+    end
+end
+
+post('/discussion/edit/:id') do
+    result = spararedigeringdisk(params, session[:id])
+    if result == false
+        halt 403
+    else
+        redirect("/discussion/#{result}")
+    end
+end
+
 post('/discussion/delete/:id') do
     result = tabortdisk(params, session[:id])
     if result == false
@@ -95,6 +114,24 @@ end
 post('/post/create/:id') do
     skapainlg(params, session[:id])
     redirect("/discussion/#{params["id"]}")
+end
+
+get('/post/edit/:id') do
+    result = redigerainlg(params, session[:id])
+    if result == false
+        halt 403
+    else
+        slim(:editpost, locals:{post:result})
+    end
+end
+
+post('/post/edit/:id') do
+    result = spararedigeringinlg(params, session[:id])
+    if result == false
+        halt 403
+    else
+        redirect("/discussion/#{result}")
+    end
 end
 
 post('/post/delete/:id') do 
