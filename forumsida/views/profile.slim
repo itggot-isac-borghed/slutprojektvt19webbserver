@@ -4,3 +4,8 @@ a href="/" Hem
 -if profile["Id"] == session[:id]
     a href="/saved" 
         P Dina följda diskussioner.
+
+h3 Om
+p="#{profile["Info"]}"
+-if profile["Id"] == session[:id]
+    form action="/users/edit/#{profile["Id"]}" method="post"
