@@ -1,0 +1,9 @@
+h1 Dina följda diskussioner
+a href="/" Hem
+
+-if saved != []
+    -saved.each do |elem|
+        a href="/discussion/#{elem["Id"]}"
+            p="#{elem["Titel"]}"
+-else
+    p Du följer inga diskussioner

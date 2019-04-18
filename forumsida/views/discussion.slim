@@ -10,6 +10,9 @@ img src="/img/#{disc["Bild"]}" alt=""
         a href="/discussion/edit/#{disc["Id"]}" Redigera Diskussion
     form action="/discussion/delete/#{disc["Id"]}" method="post"
         input type="submit" value="Radera diskussion"
+-if session[:account]
+    form action="/save/#{disc["Id"]}" method="post"
+        input type="submit" value="Följ diskussion"
 h3 Inlägg
 -if session[:account]
     p Lägg till ett inlägg.

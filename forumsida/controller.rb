@@ -7,7 +7,7 @@ require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
+    set :secured_route, ["/saved", "/save/", "/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
 end
 
 before do
@@ -24,7 +24,18 @@ get('/') do
 end
 
 get('/users/:id') do
-    
+    result = profil(params)
+    slim(:profile, locals:{profile:result})
+end
+
+get('/saved') do 
+    result = saved(session[:id])
+    slim(:saved, locals:{saved:result})
+end
+
+post('/save/:id') do
+    save(params, session[:id])
+    redirect("/discussion/#{params["id"]}")
 end
 
 get('/login') do

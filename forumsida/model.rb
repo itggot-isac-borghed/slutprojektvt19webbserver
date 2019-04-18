@@ -19,6 +19,24 @@ def laddabild(params)
     return @filename
 end
 
+def profil(params)
+    db = connect()
+    profil = db.execute('SELECT * FROM Användare WHERE Id=?', params["id"])
+    return profil.first
+end
+
+def saved(userid)
+    db = connect()
+    followed = db.execute('SELECT Diskussioner.Id,Diskussioner.Titel FROM Diskussioner INNER JOIN Användare_Diskussioner 
+        WHERE Användare_Diskussioner.DiskId = Diskussioner.Id AND Användare_Diskussioner.AnvId = ?', userid)
+    return followed
+end
+
+def save(params, userid)
+    db = connect
+    db.execute('INSERT INTO Användare_Diskussioner(AnvId, DiskId) VALUES(?, ?)', userid, params["id"])
+end
+
 def login(params)
     db = connect()
     user = db.execute('SELECT Lösenord,Id FROM Användare WHERE Namn=?', params["Username"])
