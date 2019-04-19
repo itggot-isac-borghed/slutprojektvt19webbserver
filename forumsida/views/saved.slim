@@ -5,5 +5,7 @@ a href="/" Hem
     -saved.each do |elem|
         a href="/discussion/#{elem["Id"]}"
             p="#{elem["Titel"]}"
+        form action="/saved/delete/#{elem["Id"]}" method="post"
+            input type="submit" value="Sluta följa"
 -else
     p Du följer inga diskussioner

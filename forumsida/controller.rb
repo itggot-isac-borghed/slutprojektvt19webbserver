@@ -7,7 +7,7 @@ require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/saved", "/save/", "/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
+    set :secured_route, ["/saved", "/save/", "/users/edit/", "/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
 end
 
 before do
@@ -33,9 +33,22 @@ get('/saved') do
     slim(:saved, locals:{saved:result})
 end
 
+post('/saved/delete/:id') do
+    deletesave(params, session[:id])
+    redirect('/saved')
+end
+
 post('/save/:id') do
     save(params, session[:id])
     redirect("/discussion/#{params["id"]}")
+end
+
+post('/users/edit/:id') do 
+    if params["id"].to_i != session[:id]
+        halt 403
+    end
+    editinfo(params, session[:id])
+    redirect("/users/#{params["id"]}")
 end
 
 get('/login') do

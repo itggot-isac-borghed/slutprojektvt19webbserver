@@ -32,9 +32,19 @@ def saved(userid)
     return followed
 end
 
+def deletesave(params, userid)
+    db = connect()
+    db.execute('DELETE FROM Användare_Diskussioner WHERE AnvId=? AND DiskId=?', userid, params["id"])
+end
+
 def save(params, userid)
     db = connect
     db.execute('INSERT INTO Användare_Diskussioner(AnvId, DiskId) VALUES(?, ?)', userid, params["id"])
+end
+
+def editinfo(params, userid)
+    db = connect()
+    db.execute('UPDATE Användare SET Info=? WHERE Id=?', params["info"], userid)
 end
 
 def login(params)
