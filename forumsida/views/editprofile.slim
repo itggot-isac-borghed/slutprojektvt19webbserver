@@ -1,0 +1,13 @@
+h1 Redigera profil
+a href="/" Hem
+
+p Lämna de fält du inte vill ändra tomma
+form action="/users/update/#{profile["Id"]}" method="post"
+    input type="text" name="username" placeholder="Ändra användarnamn"
+    p 
+    input type="text" name="mail" placeholder="Ändra din mailaddress"
+    p
+    input type="password" name="password" placeholder="Ändra ditt lösenord"
+    p
+    input type="password" name="password2" placeholder="Skriv in ditt lösenord"
+    input type="submit" value="Uppdatera profil"

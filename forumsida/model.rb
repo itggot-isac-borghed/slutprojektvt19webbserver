@@ -25,6 +25,25 @@ def profil(params)
     return profil.first
 end
 
+def updateprofile(params, userid)
+    db = connect()
+    password = db.execute('SELECT Lösenord FROM Användare WHERE Id=?', userid).first
+    if (BCrypt::Password.new(password) == params["password2"]) == true
+        if params["password"] != []
+            db.execute('UPDATE Användare SET Lösenord=? WHERE Id=?', BCrypt::Password.create(params["password"], userid)
+        end
+        if params["mail"] != []
+            db.execute('UPDATE Användare SET Mail=? WHERE Id=?', params["mail"], userid)
+        end
+        if params["username"] != []
+            db.execute('UPDATE Användare SET Namn=? WHERE Id=?', params["username"], userid)
+        end
+        return true
+    else
+        return false
+    end
+end
+
 def saved(userid)
     db = connect()
     followed = db.execute('SELECT Diskussioner.Id,Diskussioner.Titel FROM Diskussioner INNER JOIN Användare_Diskussioner 

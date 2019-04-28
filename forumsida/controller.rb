@@ -7,7 +7,7 @@ require_relative 'model.rb'
 enable :sessions
 
 configure do
-    set :secured_route, ["/saved", "/save/", "/users/edit/", "/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
+    set :secured_route, ["/saved", "/save/", "/users/update/", "/users/edit/", "/post/create/", "/discussion/create/", "/discussion/edit/", "/discussion/delete/", "/post/edit/", "/post/delete/"]
 end
 
 before do
@@ -26,6 +26,20 @@ end
 get('/users/:id') do
     result = profil(params)
     slim(:profile, locals:{profile:result})
+end
+
+get('/users/edit/:id') do 
+    result = profil(params)
+    slim(:editprofile, locals:{profile:result})
+end
+
+post('/users/update/:id') do 
+    result = updateprofile(params, session[:id])
+    if result == true
+        redirect('/')
+    else
+        halt 403
+    end
 end
 
 get('/saved') do 
