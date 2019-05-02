@@ -83,7 +83,10 @@ end
 
 def register(params)
     db = connect()
-    if params["Username"] != "" && params["Password"] != "" && params["Mail"] != ""
+    if params["Username"] != "" && params["Password"] != "" && params["Mail"] != "" && params["Password"] == params["Password2"]
+        if db.execute('SELECT Id FROM Användare WHERE Namn=?, Mail=?', params["Username"], params["Mail"]) != []
+            return false
+        end
         db.execute('INSERT INTO Användare(Namn, Lösenord, Mail) VALUES (?, ?, ?)', params["Username"], BCrypt::Password.create(params["Password"]), params["Mail"])
         return true
     else
