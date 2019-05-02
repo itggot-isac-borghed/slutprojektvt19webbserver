@@ -21,7 +21,7 @@ hela sidan först
 * För att redigera diskussionen skickas man till en ny sida där man fyller i ett formulär som liknar det som behövs för att skapa en ny diskussion. Om man inte ändrar på något så behålls det som det var.
 * För att redigera inlägg skickas man också till en ny sida där man fyller i ett formulär. Likväl så ändras inte inlägget om ingen ny information skrivs.
 
-## 3. Funktionalitet (med sekvensdiagram i misc för registrering och inlägg)
+## 3. Funktionalitet (med sekvensdiagram i misc för registrering och hämtande av följda diskussioner)
 * Inloggningssystem: Vid inloggning så skickar man sitt användarnamn och lösenord till servern. Servern jämför användarnamnet och det hashade lösenordet (görs med bcrypt biblioteket i ruby) med det som är sparat i databasen. Om det matchar skickas man till hemvyn och användarnamnet samt användarens id sparas i sessioner. Misslyckas det så får man försöka igen på en sida där det står att inloggning misslyckades.
 * Registrering: När man registrerar så skickar man sitt önskade användarnamn, lösenord (repeterat två gånger i separata fält) samt sin mailaddress. Om alla fält inte är ifyllda så registreras man inte. Sedan kollar servern om kontot redan är registrerat genom att försöka hämta ett användarid som är kopplat till det inskickade användarnamnet och mailaddressen. Om det ger ett resultat reistreras inte kontot. Om det inte ger ett resultat registreras användaren och skickas till inloggningssidan.
 * Utloggning: Från hemvyn så kan man klicka på en knapp som loggar ut en ifall man är inloggad. När detta sker så sätts användarnamnet och användarid i sessionen till nil.

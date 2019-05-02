@@ -143,7 +143,6 @@ def spararedigeringdisk(params, userid)
     end
 end
 
-
 def tabortdisk(params, userid)
     db = connect()
     disk = db.execute('SELECT ÄgarId,KatId FROM Diskussioner WHERE Id=?', params["id"]).first
