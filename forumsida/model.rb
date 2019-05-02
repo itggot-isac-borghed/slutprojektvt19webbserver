@@ -30,7 +30,7 @@ def updateprofile(params, userid)
     password = db.execute('SELECT Lösenord FROM Användare WHERE Id=?', userid).first
     if (BCrypt::Password.new(password) == params["password2"]) == true
         if params["password"] != []
-            db.execute('UPDATE Användare SET Lösenord=? WHERE Id=?', BCrypt::Password.create(params["password"], userid)
+            db.execute('UPDATE Användare SET Lösenord=? WHERE Id=?', BCrypt::Password.create(params["password"]), userid)
         end
         if params["mail"] != []
             db.execute('UPDATE Användare SET Mail=? WHERE Id=?', params["mail"], userid)
@@ -84,7 +84,7 @@ end
 def register(params)
     db = connect()
     if params["Username"] != "" && params["Password"] != "" && params["Mail"] != "" && params["Password"] == params["Password2"]
-        if db.execute('SELECT Id FROM Användare WHERE Namn=?, Mail=?', params["Username"], params["Mail"]) != []
+        if db.execute('SELECT Id FROM Användare WHERE Namn=? OR Mail=?', params["Username"], params["Mail"]) != []
             return false
         end
         db.execute('INSERT INTO Användare(Namn, Lösenord, Mail) VALUES (?, ?, ?)', params["Username"], BCrypt::Password.create(params["Password"]), params["Mail"])
