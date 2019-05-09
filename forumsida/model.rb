@@ -184,7 +184,15 @@ module Model
         return db.execute('SELECT Id,Titel FROM Diskussioner WHERE KatId=?', id), db.execute('SELECT * FROM Kategorier WHERE Id=?', id)
     end
 
-    
+    # Creates a discussion
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] :id The ID of the category
+    # @option params [Hash] :file The image of the discussion
+    # @option params [String] titel The title of the discussion
+    # @option params [String] info The information of the discussion
+    # @userid [Integer] :id The ID of the user
+    #
     def skapadisk(params, userid)
         db = connect()
         @filename = laddabild(params)
