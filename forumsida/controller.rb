@@ -52,7 +52,7 @@ end
 # @param [String] password2, The password which is used for validation
 # @param [String] mail, The email which is to be updated
 # @param [String] username, The username which is to be updated
-# @session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#updateprofile
 post('/users/update/:id') do 
@@ -66,7 +66,7 @@ end
 
 # Displays a user's saved discussions
 #
-# @session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#saved
 get('/saved') do 
@@ -77,7 +77,7 @@ end
 # Removes a discussion from being saved and redirects to '/saved'
 #
 # @param [Integer] :id, The ID of the discussion
-# @session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#deletesave
 post('/saved/delete/:id') do
@@ -88,7 +88,7 @@ end
 # Saves a discussion to a user and redirects to '/discussion/:id'
 #
 # @param [Integer] :id, The ID of the discussion
-# @session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#save
 post('/save/:id') do
@@ -99,7 +99,7 @@ end
 # Edits the information of a user's profile and redirects to 'users/:id' or displays error 403
 #
 # @param [Integer] :id, The ID of the profile
-# @session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#editinfo
 post('/users/edit/:id') do 
@@ -138,8 +138,8 @@ end
 
 # Log out a user and redirect to '/'
 #
-# @session [String] :account, The name of the user
-# @session [Integer] :id, The ID of the user
+# @param [String] :account, The name of the user
+# @param [Integer] :userid, The ID of the user
 #
 post('/logout') do
     session[:account], session[:id] = nil, nil
@@ -189,7 +189,7 @@ end
 
 # Display the create discussions page
 #
-# param [Integer] :id, The ID of the category
+# @param [Integer] :id, The ID of the category
 #
 get('/discussion/create/:id') do
     slim(:createdisc, locals:{id:params["id"]})
@@ -197,11 +197,11 @@ end
 
 # Create a discussion and redirect to it
 #
-# param [Integer] :id, The ID of the category
-# param [Hash] :file, The image of the discussion
-# param [String] titel, The title of the discussion
-# param [String] info, The information of the discussion
-# session [Integer] :id, The ID of the user
+# @param [Integer] :id, The ID of the category
+# @param [Hash] :file, The image file of the discussion
+# @param [String] titel, The title of the discussion
+# @param [String] info, The information of the discussion
+# @param [Integer] :id, The ID of the user
 #
 # @see Model#skapadisk 
 post('/discussion/create/:id') do
@@ -209,6 +209,11 @@ post('/discussion/create/:id') do
     redirect("/categories/#{params["id"]}")
 end
 
+# Display the discussion page
+#
+# @param [Integer] :id, The ID of the discussion
+#
+# @see Model#diskussion
 get('/discussion/:id') do
     diskussion = diskussion(params["id"])
     inlg = diskussion[1]
@@ -216,6 +221,12 @@ get('/discussion/:id') do
     slim(:discussion, locals:{disc:disk[0], posts:inlg})
 end
 
+# Display the edit discussion page
+#
+# @param [Integer] :id, The ID of the discussion
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#redigeradisk
 get('/discussion/edit/:id') do
     result = redigeradisk(params, session[:id])
     if result == false
@@ -225,6 +236,15 @@ get('/discussion/edit/:id') do
     end
 end
 
+# Edits a discussion and redirects to '/discussion/:id' or gives error 403
+#
+# @param [Integer] :id, The ID of the discussion
+# @param [Hash] :file, The image file of the discussion
+# @param [String] Titel, The title of the discussion
+# @param [String] Info, The information about the discussion
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#spararedigeringdisk
 post('/discussion/edit/:id') do
     result = spararedigeringdisk(params, session[:id])
     if result == false
@@ -234,6 +254,12 @@ post('/discussion/edit/:id') do
     end
 end
 
+# Deletes a discussion
+#
+# @param [Integer] :id, The ID of the discussion
+# @param [Integer] :id, The ID of the user
+#
+# @see Model#tabortdisk
 post('/discussion/delete/:id') do
     result = tabortdisk(params, session[:id])
     if result == false
@@ -243,11 +269,25 @@ post('/discussion/delete/:id') do
     end
 end
 
+# Creates a post in a discussion and redirects to '/discussion/:id'
+#
+# @param [Integer] :id, The ID of the discussion
+# @param [String] info, The information of the post
+# @param [Hash] :file, The image of the post
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#skapainlg
 post('/post/create/:id') do
     skapainlg(params, session[:id])
     redirect("/discussion/#{params["id"]}")
 end
 
+# Display the edit post page or give error 403 if the user does not own the post
+#
+# @param [Integer] :id, The ID of the post
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#redigerainlg
 get('/post/edit/:id') do
     result = redigerainlg(params, session[:id])
     if result == false
@@ -257,6 +297,14 @@ get('/post/edit/:id') do
     end
 end
 
+# Edits a post and redirect to '/discussion/:id' or give error 403
+#
+# @param [Integer] :id, The ID of the post
+# @param [Hash] :file, The image of the post
+# @param [String] Info, The information of the post
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#spararedigeringinlg
 post('/post/edit/:id') do
     result = spararedigeringinlg(params, session[:id])
     if result == false
@@ -266,6 +314,12 @@ post('/post/edit/:id') do
     end
 end
 
+# Deletes a post and redirect to '/discussion/:id' or give error 403
+#
+# @param [Integer] :id, The ID of the post
+# @param [Integer] :userid, The ID of the user
+#
+# @see Model#tabortinlg
 post('/post/delete/:id') do 
     result = tabortinlg(params, session[:id])
     if result == false

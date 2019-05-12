@@ -187,11 +187,11 @@ module Model
     # Creates a discussion
     #
     # @param [Hash] params form data
-    # @option params [Integer] :id The ID of the category
+    # @option params [Integer] id The ID of the category
     # @option params [Hash] :file The image of the discussion
     # @option params [String] titel The title of the discussion
     # @option params [String] info The information of the discussion
-    # @userid [Integer] :id The ID of the user
+    # @userid [Integer] The ID of the user
     #
     def skapadisk(params, userid)
         db = connect()
@@ -200,12 +200,31 @@ module Model
             params["titel"], params["info"], @filename)
     end
 
+    # Loads a discussion and all posts that are made in it
+    #
+    # @id [Integer] The ID of the discussion
+    #
+    # @return [Array] consisting of the discussion and the posts
     def diskussion(id)
         db = connect()
         return [db.execute('SELECT Diskussioner.*, Användare.Namn FROM Diskussioner INNER JOIN Användare ON Diskussioner.ÄgarId = Användare.Id WHERE Diskussioner.Id=?', id), 
             db.execute('SELECT Inlägg.*, Användare.Namn FROM Inlägg INNER JOIN Användare ON Inlägg.ÄgarId = Användare.Id WHERE Inlägg.DiskId=?', id)]
     end
 
+    # Loads a discussion and checks if the user owns the discussion
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the discussion
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Hash]
+    #   * :Id [Integer] The ID of the discussion
+    #   * :ÄgarId [Integer] The ID of the owner of the discussion
+    #   * :KatId [Integer] The ID of the category of the discussion
+    #   * :Titel [String] The title of the discussion
+    #   * :Info [String] The information of the discussion
+    #   * :Bild [String] The image of the discussion
+    # @return [false] if the user does not own the discussion
     def redigeradisk(params, userid)
         db = connect()
         disk = db.execute('SELECT * FROM Diskussioner WHERE Id=? AND ÄgarId=?', params["id"], userid)
@@ -216,6 +235,17 @@ module Model
         end
     end
 
+    # Edits a discussion
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the discussion
+    # @option params [Hash] :file The image file of the discussion
+    # @option params [String] Titel The title of the discussion
+    # @option params [String] Info The information about the discussion
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Integer] The ID of the discussion
+    # @return [false] if the user does not own the discussion
     def spararedigeringdisk(params, userid)
         db = connect()
         disk = db.execute('SELECT * FROM Diskussioner WHERE Id=? AND ÄgarId=?', params["id"], userid)
@@ -232,6 +262,14 @@ module Model
         end
     end
 
+    # Deletes a discussion
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the discussion
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Integer] The ID of the discussion's category
+    # @return [false] if the user does not own the discussion
     def tabortdisk(params, userid)
         db = connect()
         disk = db.execute('SELECT ÄgarId,KatId FROM Diskussioner WHERE Id=?', params["id"]).first
@@ -244,12 +282,33 @@ module Model
         end
     end
 
+    # Creates a post in a discussion
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the discussion
+    # @option params [String] info The information of the post
+    # @option params [Hash] :file The image of the post
+    # @userid [Integer] The ID of the user
+    #
     def skapainlg(params, userid)
         db = connect()
         @filename = laddabild(params)
         db.execute('INSERT INTO Inlägg(DiskId, ÄgarId, Info, Bild) VALUES (?, ?, ?, ?)', params["id"], userid, params["info"], @filename)
     end
 
+    # Loads a post and checks if the user owns the post
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id, The ID of the post
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Hash]
+    #   * :Id, The ID of the post
+    #   * :DiskId, The ID of the post's discussion
+    #   * :ÄgarId, The ID of the owner of the post
+    #   * :Info, The information of the post
+    #   * :Bild, The image of the post
+    # @return [false] if the user does not own the post
     def redigerainlg(params, userid)
         db = connect()
         inlg = db.execute('SELECT * FROM Inlägg WHERE Id=? AND ÄgarId=?', params["id"], userid)
@@ -260,6 +319,16 @@ module Model
         end
     end
 
+    # Edits a post
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the post
+    # @option params [Hash] :file The image of the post
+    # @option params [String] Info The information of the post
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Integer] the ID of the discussion
+    # @return [false] if the user does not own the post
     def spararedigeringinlg(params, userid)
         db = connect()
         inlg = db.execute('SELECT * FROM Inlägg WHERE Id=? AND ÄgarId=?', params["id"], userid)
@@ -276,6 +345,14 @@ module Model
         end
     end
 
+    # Deletes a post
+    #
+    # @param [Hash] params form data
+    # @option params [Integer] id The ID of the post
+    # @userid [Integer] The ID of the user
+    #
+    # @return [Integer] the ID of the discussion
+    # @return [false] if the user does not own the post
     def tabortinlg(params, userid)
         db = connect()
         inlg = db.execute('SELECT ÄgarId,DiskId FROM Inlägg WHERE Id=?', params["id"]).first
