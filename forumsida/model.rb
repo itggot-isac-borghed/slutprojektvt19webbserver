@@ -49,7 +49,7 @@ module Model
     # @option params [String] password2 The password which is used for validation
     # @option params [String] mail The email which is to be updated
     # @option params [String] username The username which is to be updated
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [true]
     # @return [false] if IDs do not match or password2 does not match the user's current password
@@ -77,7 +77,7 @@ module Model
 
     # Loads a user's saved discussions
     #
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Array] containing the discussions
     def saved(userid)
@@ -91,7 +91,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     def deletesave(params, userid)
         db = connect()
@@ -102,7 +102,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     def save(params, userid)
         db = connect
@@ -113,7 +113,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the profile
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     def editinfo(params, userid)
         db = connect()
@@ -176,7 +176,7 @@ module Model
 
     # Load the discussions of a category
     #
-    # @id [Integer] The ID of the category
+    # @param [Integer] id The ID of the category
     #
     # @return [Array] consisting of the discussions
     def kategori(id)
@@ -191,7 +191,7 @@ module Model
     # @option params [Hash] :file The image of the discussion
     # @option params [String] titel The title of the discussion
     # @option params [String] info The information of the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     def skapadisk(params, userid)
         db = connect()
@@ -202,7 +202,7 @@ module Model
 
     # Loads a discussion and all posts that are made in it
     #
-    # @id [Integer] The ID of the discussion
+    # @param [Integer] id The ID of the discussion
     #
     # @return [Array] consisting of the discussion and the posts
     def diskussion(id)
@@ -215,7 +215,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Hash]
     #   * :Id [Integer] The ID of the discussion
@@ -242,7 +242,7 @@ module Model
     # @option params [Hash] :file The image file of the discussion
     # @option params [String] Titel The title of the discussion
     # @option params [String] Info The information about the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Integer] The ID of the discussion
     # @return [false] if the user does not own the discussion
@@ -266,7 +266,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the discussion
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Integer] The ID of the discussion's category
     # @return [false] if the user does not own the discussion
@@ -288,7 +288,7 @@ module Model
     # @option params [Integer] id The ID of the discussion
     # @option params [String] info The information of the post
     # @option params [Hash] :file The image of the post
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     def skapainlg(params, userid)
         db = connect()
@@ -300,7 +300,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id, The ID of the post
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Hash]
     #   * :Id, The ID of the post
@@ -325,7 +325,7 @@ module Model
     # @option params [Integer] id The ID of the post
     # @option params [Hash] :file The image of the post
     # @option params [String] Info The information of the post
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Integer] the ID of the discussion
     # @return [false] if the user does not own the post
@@ -349,7 +349,7 @@ module Model
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the post
-    # @userid [Integer] The ID of the user
+    # @param [Integer] userid The ID of the user
     #
     # @return [Integer] the ID of the discussion
     # @return [false] if the user does not own the post
