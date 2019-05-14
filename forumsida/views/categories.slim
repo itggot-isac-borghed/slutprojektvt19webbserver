@@ -2,6 +2,6 @@ h1 Kategorier
 a href="/"
     p Hem
 
--cats.each do |cat|
-    a href="/categories/#{cat["Id"]}"
-        p="#{cat["Namn"]}"
+-cats.each do |a|
+    a href="/categories/#{a["Id"]}"
+        p="#{a["Name"]}"

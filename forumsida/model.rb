@@ -14,7 +14,7 @@ module Model
     # @option params [Hash] :file Image information
     #
     # @return [String] the name of the file
-    def laddabild(params)
+    def load_image(params)
         if params[:file]
             filnamn = params[:file][:filename].split(".")
             filnamn[0] = SecureRandom.hex(10)
@@ -35,10 +35,10 @@ module Model
     # @option params [Integer] id The ID of the profile
     #
     # @return [Hash] consisting of the profile content
-    def profil(params)
+    def load_profile(params)
         db = connect()
-        profil = db.execute('SELECT * FROM Användare WHERE Id=?', params["id"])
-        return profil.first
+        profile = db.execute('SELECT * FROM users WHERE Id=?', params["id"])
+        return profile.first
     end
 
     # Updates the profile of a user
@@ -47,27 +47,28 @@ module Model
     # @option params [Integer] id The ID of the profile
     # @option params [String] password The password which is to be updated
     # @option params [String] password2 The password which is used for validation
+    # @option params [String] password3 Repetition of the password which is to be updated
     # @option params [String] mail The email which is to be updated
     # @option params [String] username The username which is to be updated
     # @param [Integer] userid The ID of the user
     #
     # @return [true]
     # @return [false] if IDs do not match or password2 does not match the user's current password
-    def updateprofile(params, userid)
+    def update_profile(params, userid)
         db = connect()
         if params["id"] != userid
             return false
         end
-        password = db.execute('SELECT Lösenord FROM Användare WHERE Id=?', userid).first
-        if (BCrypt::Password.new(password["Lösenord"]) == params["password2"]) == true
-            if params["password"] != ""
-                db.execute('UPDATE Användare SET Lösenord=? WHERE Id=?', BCrypt::Password.create(params["password"]), userid)
+        password = db.execute('SELECT Password FROM users WHERE Id=?', userid).first
+        if (BCrypt::Password.new(password["Password"]) == params["password2"]) == true
+            if params["password"] != "" && params["password"] == params["password3"]
+                db.execute('UPDATE users SET Password=? WHERE Id=?', BCrypt::Password.create(params["password"]), userid)
             end
             if params["mail"] != ""
-                db.execute('UPDATE Användare SET Mail=? WHERE Id=?', params["mail"], userid)
+                db.execute('UPDATE users SET Mail=? WHERE Id=?', params["mail"], userid)
             end
             if params["username"] != ""
-                db.execute('UPDATE Användare SET Namn=? WHERE Id=?', params["username"], userid)
+                db.execute('UPDATE users SET Username=? WHERE Id=?', params["username"], userid)
             end
             return true
         else
@@ -82,8 +83,8 @@ module Model
     # @return [Array] containing the discussions
     def saved(userid)
         db = connect()
-        followed = db.execute('SELECT Diskussioner.Id,Diskussioner.Titel FROM Diskussioner INNER JOIN Användare_Diskussioner 
-            WHERE Användare_Diskussioner.DiskId = Diskussioner.Id AND Användare_Diskussioner.AnvId = ?', userid)
+        followed = db.execute('SELECT discussions.Id,discussions.Title FROM discussions INNER JOIN users_discussions 
+            WHERE users_discussions.DiscId = discussions.Id AND users_discussions.UserId = ?', userid)
         return followed
     end
 
@@ -93,9 +94,9 @@ module Model
     # @option params [Integer] id The ID of the discussion
     # @param [Integer] userid The ID of the user
     #
-    def deletesave(params, userid)
+    def delete_save(params, userid)
         db = connect()
-        db.execute('DELETE FROM Användare_Diskussioner WHERE AnvId=? AND DiskId=?', userid, params["id"])
+        db.execute('DELETE FROM users_discussions WHERE UserId=? AND DiscId=?', userid, params["id"])
     end
 
     # Saves a discussion to a user
@@ -106,7 +107,7 @@ module Model
     #
     def save(params, userid)
         db = connect
-        db.execute('INSERT INTO Användare_Diskussioner(AnvId, DiskId) VALUES(?, ?)', userid, params["id"])
+        db.execute('INSERT INTO users_discussions(UserId, DiscId) VALUES(?, ?)', userid, params["id"])
     end
 
     # Edits the information of a user's profile
@@ -115,9 +116,9 @@ module Model
     # @option params [Integer] id The ID of the profile
     # @param [Integer] userid The ID of the user
     #
-    def editinfo(params, userid)
+    def edit_info(params, userid)
         db = connect()
-        db.execute('UPDATE Användare SET Info=? WHERE Id=?', params["info"], userid)
+        db.execute('UPDATE users SET Info=? WHERE Id=?', params["info"], userid)
     end
 
     # Login a user
@@ -126,15 +127,14 @@ module Model
     # @option params [String] Username The input username
     # @option params [String] Password The input password
     #
-    # @return [true]
+    # @return [true] and the users ID
     # @return [false] if the user doesn't exist in the database or if the credentials don't match the user
     def login(params)
         db = connect()
-        user = db.execute('SELECT Lösenord,Id FROM Användare WHERE Namn=?', params["Username"])
+        user = db.execute('SELECT Password,Id FROM users WHERE Username=?', params["Username"])
         if user.empty? == false
-            if (BCrypt::Password.new(user[0]["Lösenord"]) == params["Password"]) == true
-                session[:account], session[:id] = params["Username"], user[0]["Id"]
-                return true
+            if (BCrypt::Password.new(user[0]["Password"]) == params["Password"]) == true
+                return [true, user[0]["Id"]]
             else
                 return false
             end
@@ -156,10 +156,10 @@ module Model
     def register(params)
         db = connect()
         if params["Username"] != "" && params["Password"] != "" && params["Mail"] != "" && params["Password"] == params["Password2"]
-            if db.execute('SELECT Id FROM Användare WHERE Namn=? OR Mail=?', params["Username"], params["Mail"]) != []
+            if db.execute('SELECT Id FROM users WHERE Username=? OR Mail=?', params["Username"], params["Mail"]) != []
                 return false
             end
-            db.execute('INSERT INTO Användare(Namn, Lösenord, Mail) VALUES (?, ?, ?)', params["Username"], BCrypt::Password.create(params["Password"]), params["Mail"])
+            db.execute('INSERT INTO users(Username, Password, Mail) VALUES (?, ?, ?)', params["Username"], BCrypt::Password.create(params["Password"]), params["Mail"])
             return true
         else
             return false
@@ -169,9 +169,9 @@ module Model
     # Load the categories in the database
     #
     # @return [Array] consisting of the categories
-    def kategorier()
+    def categories()
         db = connect()
-        db.execute('SELECT * FROM Kategorier').first
+        db.execute('SELECT * FROM categories')
     end
 
     # Load the discussions of a category
@@ -179,9 +179,9 @@ module Model
     # @param [Integer] id The ID of the category
     #
     # @return [Array] consisting of the discussions
-    def kategori(id)
+    def category(id)
         db = connect()
-        return db.execute('SELECT Id,Titel FROM Diskussioner WHERE KatId=?', id), db.execute('SELECT * FROM Kategorier WHERE Id=?', id)
+        return db.execute('SELECT Id,Title FROM discussions WHERE CatId=?', id), db.execute('SELECT * FROM categories WHERE Id=?', id)
     end
 
     # Creates a discussion
@@ -193,10 +193,10 @@ module Model
     # @option params [String] info The information of the discussion
     # @param [Integer] userid The ID of the user
     #
-    def skapadisk(params, userid)
+    def create_discussion(params, userid)
         db = connect()
-        @filename = laddabild(params)
-        db.execute('INSERT INTO Diskussioner(ÄgarId, KatId, Titel, Info, Bild) VALUES (?, ?, ?, ?, ?)', userid, params["id"], 
+        @filename = load_image(params)
+        db.execute('INSERT INTO discussions(UserId, CatId, Title, Info, Image) VALUES (?, ?, ?, ?, ?)', userid, params["id"], 
             params["titel"], params["info"], @filename)
     end
 
@@ -205,10 +205,10 @@ module Model
     # @param [Integer] id The ID of the discussion
     #
     # @return [Array] consisting of the discussion and the posts
-    def diskussion(id)
+    def discussion(id)
         db = connect()
-        return [db.execute('SELECT Diskussioner.*, Användare.Namn FROM Diskussioner INNER JOIN Användare ON Diskussioner.ÄgarId = Användare.Id WHERE Diskussioner.Id=?', id), 
-            db.execute('SELECT Inlägg.*, Användare.Namn FROM Inlägg INNER JOIN Användare ON Inlägg.ÄgarId = Användare.Id WHERE Inlägg.DiskId=?', id)]
+        return [db.execute('SELECT discussions.*, users.Username FROM discussions INNER JOIN users ON discussions.UserId = users.Id WHERE discussions.Id=?', id), 
+            db.execute('SELECT posts.*, users.Username FROM posts INNER JOIN users ON posts.userId = users.Id WHERE posts.DiscId=?', id)]
     end
 
     # Loads a discussion and checks if the user owns the discussion
@@ -219,15 +219,15 @@ module Model
     #
     # @return [Hash]
     #   * :Id [Integer] The ID of the discussion
-    #   * :ÄgarId [Integer] The ID of the owner of the discussion
-    #   * :KatId [Integer] The ID of the category of the discussion
-    #   * :Titel [String] The title of the discussion
+    #   * :UserId [Integer] The ID of the owner of the discussion
+    #   * :CatId [Integer] The ID of the category of the discussion
+    #   * :Title [String] The title of the discussion
     #   * :Info [String] The information of the discussion
-    #   * :Bild [String] The image of the discussion
+    #   * :Image [String] The image of the discussion
     # @return [false] if the user does not own the discussion
-    def redigeradisk(params, userid)
+    def edit_discussion(params, userid)
         db = connect()
-        disk = db.execute('SELECT * FROM Diskussioner WHERE Id=? AND ÄgarId=?', params["id"], userid)
+        disk = db.execute('SELECT * FROM discussions WHERE Id=? AND UserId=?', params["id"], userid)
         if disk != []
             return disk.first
         else
@@ -235,7 +235,7 @@ module Model
         end
     end
 
-    # Edits a discussion
+    # Updates a discussion
     #
     # @param [Hash] params form data
     # @option params [Integer] id The ID of the discussion
@@ -246,17 +246,17 @@ module Model
     #
     # @return [Integer] The ID of the discussion
     # @return [false] if the user does not own the discussion
-    def spararedigeringdisk(params, userid)
+    def update_discussion(params, userid)
         db = connect()
-        disk = db.execute('SELECT * FROM Diskussioner WHERE Id=? AND ÄgarId=?', params["id"], userid)
+        disk = db.execute('SELECT * FROM discussions WHERE Id=? AND UserId=?', params["id"], userid)
         if disk == []
             return false
         else
             if params[:file]
-                @filename = laddabild(params)
-                db.execute('UPDATE Diskussioner SET Titel=?,Info=?,Bild=? WHERE Id=?', params["Titel"], params["Info"], @filename, params["id"])
+                @filename = load_image(params)
+                db.execute('UPDATE discussions SET Title=?,Info=?,Image=? WHERE Id=?', params["Titel"], params["Info"], @filename, params["id"])
             else
-                db.execute('UPDATE Diskussioner SET Titel=?, Info=? WHERE Id=?', params["Titel"], params["Info"], params["id"])
+                db.execute('UPDATE discussions SET Title=?, Info=? WHERE Id=?', params["Titel"], params["Info"], params["id"])
             end
             return disk.first["Id"]
         end
@@ -270,15 +270,15 @@ module Model
     #
     # @return [Integer] The ID of the discussion's category
     # @return [false] if the user does not own the discussion
-    def tabortdisk(params, userid)
+    def remove_discussion(params, userid)
         db = connect()
-        disk = db.execute('SELECT ÄgarId,KatId FROM Diskussioner WHERE Id=?', params["id"]).first
+        disk = db.execute('SELECT UserId,CatId FROM discussions WHERE Id=?', params["id"]).first
         if disk.length == 0 || userid != disk["ÄgarId"]
             return false
         else
-            db.execute('DELETE FROM Diskussioner WHERE Id=?', params["id"])
-            db.execute('DELETE FROM Inlägg WHERE DiskId=?', params["id"])
-            return disk["KatId"]
+            db.execute('DELETE FROM discussions WHERE Id=?', params["id"])
+            db.execute('DELETE FROM posts WHERE DiskId=?', params["id"])
+            return disk["CatId"]
         end
     end
 
@@ -290,10 +290,10 @@ module Model
     # @option params [Hash] :file The image of the post
     # @param [Integer] userid The ID of the user
     #
-    def skapainlg(params, userid)
+    def create_post(params, userid)
         db = connect()
-        @filename = laddabild(params)
-        db.execute('INSERT INTO Inlägg(DiskId, ÄgarId, Info, Bild) VALUES (?, ?, ?, ?)', params["id"], userid, params["info"], @filename)
+        @filename = load_image(params)
+        db.execute('INSERT INTO posts(DiscId, UserId, Info, Image) VALUES (?, ?, ?, ?)', params["id"], userid, params["info"], @filename)
     end
 
     # Loads a post and checks if the user owns the post
@@ -309,11 +309,11 @@ module Model
     #   * :Info, The information of the post
     #   * :Bild, The image of the post
     # @return [false] if the user does not own the post
-    def redigerainlg(params, userid)
+    def edit_post(params, userid)
         db = connect()
-        inlg = db.execute('SELECT * FROM Inlägg WHERE Id=? AND ÄgarId=?', params["id"], userid)
-        if inlg != []
-            return inlg.first
+        post = db.execute('SELECT * FROM posts WHERE Id=? AND UserId=?', params["id"], userid)
+        if post != []
+            return post.first
         else
             return false
         end
@@ -329,19 +329,19 @@ module Model
     #
     # @return [Integer] the ID of the discussion
     # @return [false] if the user does not own the post
-    def spararedigeringinlg(params, userid)
+    def update_post(params, userid)
         db = connect()
-        inlg = db.execute('SELECT * FROM Inlägg WHERE Id=? AND ÄgarId=?', params["id"], userid)
-        if inlg == []
+        post = db.execute('SELECT * FROM posts WHERE Id=? AND UserId=?', params["id"], userid)
+        if post == []
             return false
         else
             if params[:file]
-                @filename = laddabild(params)
-                db.execute('UPDATE Inlägg SET Info=?,Bild=? WHERE Id=?', params["Info"], @filename, params["id"])
+                @filename = load_image(params)
+                db.execute('UPDATE posts SET Info=?,Image=? WHERE Id=?', params["Info"], @filename, params["id"])
             else
-                db.execute('UPDATE Inlägg SET Info=? WHERE Id=?', params["Info"], params["id"])
+                db.execute('UPDATE posts SET Info=? WHERE Id=?', params["Info"], params["id"])
             end
-            return inlg.first["DiskId"]
+            return post.first["DiscId"]
         end
     end
 
@@ -353,14 +353,14 @@ module Model
     #
     # @return [Integer] the ID of the discussion
     # @return [false] if the user does not own the post
-    def tabortinlg(params, userid)
+    def delete_post(params, userid)
         db = connect()
-        inlg = db.execute('SELECT ÄgarId,DiskId FROM Inlägg WHERE Id=?', params["id"]).first
-        if userid != inlg["ÄgarId"]
+        post = db.execute('SELECT UserId,DiscId FROM posts WHERE Id=?', params["id"]).first
+        if userid != post["UserId"]
             return false
         else
-            db.execute('DELETE FROM Inlägg WHERE Id=?', params["id"])
-            return inlg["DiskId"]
+            db.execute('DELETE FROM posts WHERE Id=?', params["id"])
+            return post["DiscId"]
         end
     end
 end

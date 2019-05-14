@@ -30,18 +30,18 @@ end
 # Displays a user's profile
 #
 # @param [Integer] :id, The ID of the profile
-# @see Model#profil
+# @see Model#load_profile
 get('/users/:id') do
-    result = profil(params)
+    result = load_profile(params)
     slim(:profile, locals:{profile:result})
 end
 
 # Displays a page where a user can edit their profile
 #
 # @param [Integer] :id, The ID of the profile
-# @see Model#profil
+# @see Model#load_profil
 get('/users/edit/:id') do 
-    result = profil(params)
+    result = load_profile(params)
     slim(:editprofile, locals:{profile:result})
 end
 
@@ -54,9 +54,9 @@ end
 # @param [String] username, The username which is to be updated
 # @param [Integer] :id, The ID of the user
 #
-# @see Model#updateprofile
+# @see Model#update_profile
 post('/users/update/:id') do 
-    result = updateprofile(params, session[:id])
+    result = update_profile(params, session[:id])
     if result == true
         redirect('/')
     else
@@ -79,9 +79,9 @@ end
 # @param [Integer] :id, The ID of the discussion
 # @param [Integer] :id, The ID of the user
 #
-# @see Model#deletesave
+# @see Model#delete_save
 post('/saved/delete/:id') do
-    deletesave(params, session[:id])
+    delete_save(params, session[:id])
     redirect('/saved')
 end
 
@@ -101,12 +101,12 @@ end
 # @param [Integer] :id, The ID of the profile
 # @param [Integer] :id, The ID of the user
 #
-# @see Model#editinfo
+# @see Model#edit_info
 post('/users/edit/:id') do 
     if params["id"].to_i != session[:id]
         halt 403
     end
-    editinfo(params, session[:id])
+    edit_info(params, session[:id])
     redirect("/users/#{params["id"]}")
 end
 
@@ -124,7 +124,8 @@ end
 # @see Model#login
 post('/login') do
     loggedin = login(params)
-    if loggedin == true
+    if loggedin[0] == true
+        session[:account], session[:id] = params["Username"], loggedin[1]
         redirect('/')
     else
         redirect('/loginfail')
@@ -171,9 +172,9 @@ end
 
 # Display the categories page
 #
-# @see Model#kategorier
+# @see Model#categories
 get('/categories') do
-    cat = kategorier()
+    cat = categories()
     slim(:categories, locals:{cats:cat})
 end
 
@@ -181,9 +182,9 @@ end
 #
 # @param [Integer] :id, The ID of the category
 #
-# @see Model#kategori
+# @see Model#category
 get('/categories/:id') do 
-    disc, kat = kategori(params["id"])
+    disc, kat = category(params["id"])
     slim(:category, locals:{discs:disc, cat:kat[0]})
 end
 
@@ -203,9 +204,9 @@ end
 # @param [String] info, The information of the discussion
 # @param [Integer] :id, The ID of the user
 #
-# @see Model#skapadisk 
+# @see Model#create_discussion 
 post('/discussion/create/:id') do
-    skapadisk(params, session[:id])
+    create_discussion(params, session[:id])
     redirect("/categories/#{params["id"]}")
 end
 
@@ -213,12 +214,12 @@ end
 #
 # @param [Integer] :id, The ID of the discussion
 #
-# @see Model#diskussion
+# @see Model#discussion
 get('/discussion/:id') do
-    diskussion = diskussion(params["id"])
-    inlg = diskussion[1]
-    disk = diskussion[0]
-    slim(:discussion, locals:{disc:disk[0], posts:inlg})
+    disc = discussion(params["id"])
+    post = disc[1]
+    disk = disc[0]
+    slim(:discussion, locals:{disc:disk[0], posts:post})
 end
 
 # Display the edit discussion page
@@ -226,9 +227,9 @@ end
 # @param [Integer] :id, The ID of the discussion
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#redigeradisk
+# @see Model#edit_discussion
 get('/discussion/edit/:id') do
-    result = redigeradisk(params, session[:id])
+    result = edit_discussion(params, session[:id])
     if result == false
         halt 403
     else
@@ -244,9 +245,9 @@ end
 # @param [String] Info, The information about the discussion
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#spararedigeringdisk
+# @see Model#update_discussion
 post('/discussion/edit/:id') do
-    result = spararedigeringdisk(params, session[:id])
+    result = update_discussion(params, session[:id])
     if result == false
         halt 403
     else
@@ -259,9 +260,9 @@ end
 # @param [Integer] :id, The ID of the discussion
 # @param [Integer] :id, The ID of the user
 #
-# @see Model#tabortdisk
+# @see Model#remove_discussion
 post('/discussion/delete/:id') do
-    result = tabortdisk(params, session[:id])
+    result = remove_discussion(params, session[:id])
     if result == false
         halt 403
     else
@@ -276,9 +277,9 @@ end
 # @param [Hash] :file, The image of the post
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#skapainlg
+# @see Model#create_post
 post('/post/create/:id') do
-    skapainlg(params, session[:id])
+    create_post(params, session[:id])
     redirect("/discussion/#{params["id"]}")
 end
 
@@ -287,9 +288,9 @@ end
 # @param [Integer] :id, The ID of the post
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#redigerainlg
+# @see Model#edit_post
 get('/post/edit/:id') do
-    result = redigerainlg(params, session[:id])
+    result = edit_post(params, session[:id])
     if result == false
         halt 403
     else
@@ -304,9 +305,9 @@ end
 # @param [String] Info, The information of the post
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#spararedigeringinlg
+# @see Model#update_post
 post('/post/edit/:id') do
-    result = spararedigeringinlg(params, session[:id])
+    result = update_post(params, session[:id])
     if result == false
         halt 403
     else
@@ -319,9 +320,9 @@ end
 # @param [Integer] :id, The ID of the post
 # @param [Integer] :userid, The ID of the user
 #
-# @see Model#tabortinlg
+# @see Model#delete_post
 post('/post/delete/:id') do 
-    result = tabortinlg(params, session[:id])
+    result = delete_post(params, session[:id])
     if result == false
         halt 403
     else

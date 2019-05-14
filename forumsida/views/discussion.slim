@@ -1,10 +1,10 @@
 h1="#{disc["Titel"]}"
 a href="/"
     p Hem
-a href="/users/#{disc["ÄgarId"]}"
-    p="Ägare: #{disc["Namn"]}"
+a href="/users/#{disc["UserId"]}"
+    p="Ägare: #{disc["Username"]}"
 p="#{disc["Info"]}"
-img src="/img/#{disc["Bild"]}" alt=""
+img src="/img/#{disc["Image"]}" alt=""
 -if disc["ÄgarId"] == session[:id]
     button
         a href="/discussion/edit/#{disc["Id"]}" Redigera Diskussion
@@ -26,11 +26,11 @@ h3 Inlägg
     -posts.each_with_index do |post,i|
         p="#{i+1}"
         p="#{post["Info"]}"
-        -if post["Bild"]
-            img src="/img/#{post["Bild"]}" alt=""
-        a href="/users/#{post["ÄgarId"]}"
-            p="Av: #{post["Namn"]}"
-        -if post["ÄgarId"] == session[:id]
+        -if post["Image"]
+            img src="/img/#{post["Image"]}" alt=""
+        a href="/users/#{post["UserId"]}"
+            p="Av: #{post["Username"]}"
+        -if post["UserId"] == session[:id]
             button
                 a href="/post/edit/#{post["Id"]}" Redigera Inlägg
             form action="/post/delete/#{post["Id"]}" method="post"

@@ -4,7 +4,7 @@ a href="/" Hem
 -if saved != []
     -saved.each do |elem|
         a href="/discussion/#{elem["Id"]}"
-            p="#{elem["Titel"]}"
+            p="#{elem["Title"]}"
         form action="/saved/delete/#{elem["Id"]}" method="post"
             input type="submit" value="Sluta följa"
 -else
